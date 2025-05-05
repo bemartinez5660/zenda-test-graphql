@@ -27,7 +27,7 @@ export class CharacterEffects {
           .pipe(
             map(characters => charactersActions.loadCharactersSuccess({payload: characters})),
             catchError((error) => {
-              return of(charactersActions.loadCharactersFailure({payload: error?.error?.error}))
+              return of(charactersActions.loadCharactersFailure({payload: error?.message}))
             })
           )
         ),

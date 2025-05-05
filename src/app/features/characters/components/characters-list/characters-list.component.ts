@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, inject, OnInit, ViewChild} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 import {Character} from '../../models/character.model';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
@@ -19,7 +19,6 @@ import {debounceTime, Observable} from 'rxjs';
 import {CharacterFilter, CharacterParams} from '../../../../core/models/character-filter';
 import {GENDER} from '../../../../core/enums/gender.enum';
 import {STATUS} from '../../../../core/enums/status.enum';
-import {CharacterGraphqlService} from '../../../../core/services/character-graphql.service';
 
 const genders: string [] = [GENDER.FEMALE, GENDER.MALE, GENDER.GENDERLESS, GENDER.UNKNOWN];
 const statuses: string [] = [STATUS.DEAD, STATUS.ALIVE, STATUS.UNKNOWN];
@@ -72,8 +71,13 @@ export class CharactersListComponent implements OnInit, AfterViewInit {
     this.filterColumns = ['filter_name', 'filter_status', 'filter_species', 'filter_type', 'filter_gender', 'filter_created', 'filter_actions'];
 
     this._store.select(selectCharacters).subscribe((characters: any) => {
-      this.dataSource.data = characters?.results;
-      this.total = characters?.info?.count;
+      if (characters?.results?.length === 0) {
+        this.error = "Characters not found";
+        this.dataSource.data = [];
+      } else {
+        this.dataSource.data = characters?.results;
+        this.total = characters?.info?.count;
+      }
     });
     this.selectedCharacter$ = this._store.select(selectSelectedCharacter);
 
@@ -90,8 +94,6 @@ export class CharactersListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-
-
     this.fetchCharacters();
     this.filtersSubscription();
   }
